@@ -13,10 +13,7 @@ hide_streamlit_style = """
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 </style>
-
 """
-
-
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", None)
 
