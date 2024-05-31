@@ -338,9 +338,9 @@ try:
 
     with st.form("groqform"):
         if not GROQ_API_KEY:
-            groq_input_key = st.text_input("Введите, выданный вам ключ ... : ", "",type="password")
+            groq_input_key = st.text_input("Введите, выданный вам ключ ... : 👇", "",type="password")
 
-        topic_text = st.text_input("О чем вы хотите написать свою книгу?", "")
+        topic_text = st.text_input("О чем вы хотите написать свою книгу? ", "")
 
         # Generate button
         submitted = st.form_submit_button(st.session_state.button_text,on_click=disable,disabled=st.session_state.button_disabled)
