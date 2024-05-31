@@ -338,7 +338,7 @@ try:
 
     with st.form("groqform"):
         if not GROQ_API_KEY:
-            groq_input_key = st.text_input("Введите ключ генерации ... : ", "",type="password")
+            groq_input_key = st.text_input("Введите, выданный вам ключ ... : ", "",type="password")
 
         topic_text = st.text_input("О чем вы хотите написать свою книгу?", "")
 
