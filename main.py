@@ -189,7 +189,7 @@ def generate_book_structure(prompt: str):
 
 def generate_section(prompt: str):
     stream = st.session_state.groq.chat.completions.create(
-        model="llama3-8b-8192",
+        model="llama3-70b-8192",
         messages=[
             {
                 "role": "system",
@@ -215,7 +215,7 @@ def generate_section(prompt: str):
             if not x_groq.usage:
                 continue
             usage = x_groq.usage
-            statistics_to_return = GenerationStatistics(input_time=usage.prompt_time, output_time=usage.completion_time, input_tokens=usage.prompt_tokens, output_tokens=usage.completion_tokens, total_time=usage.total_time,model_name="llama3-8b-8192")
+            statistics_to_return = GenerationStatistics(input_time=usage.prompt_time, output_time=usage.completion_time, input_tokens=usage.prompt_tokens, output_tokens=usage.completion_tokens, total_time=usage.total_time,model_name="llama3-70b-8192")
             yield statistics_to_return
 
 # Initialize
@@ -374,7 +374,7 @@ try:
             # st.session_state.statistics_text = str(large_model_generation_statistics)
             # display_statistics()
 
-            total_generation_statistics = GenerationStatistics(model_name="llama3-8b-8192")
+            total_generation_statistics = GenerationStatistics(model_name="llama3-70b-8192")
 
             try:
                 book_structure_json = json.loads(book_structure)
