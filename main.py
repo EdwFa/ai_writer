@@ -4,6 +4,20 @@ import json
 import os
 from io import BytesIO
 
+
+st.set_page_config(page_icon="💬", layout="wide",
+                   page_title="AI Писатель")
+
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
+
+"""
+
+
+
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", None)
 
 if 'api_key' not in st.session_state:
