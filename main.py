@@ -163,6 +163,8 @@ def generate_book_structure(prompt: str):
     """
     Returns book structure content as well as total tokens and total time for generation.
     """
+    prompt += task_struct
+
     completion = st.session_state.groq.chat.completions.create(
         model="llama3-70b-8192",
         messages=[
@@ -249,7 +251,7 @@ max_tokens_struct = st.sidebar.slider(
     help=f"Настройте максимальное количество токенов для ответа модели. Для выбранной модели: {max_tokens_range_struct}"
 )
 task_struct = st.sidebar.text_area("Задача в структуру",
-                         "При генерации структуры книги "
+                         " При генерации структуры и содержания книги "
                          "старайся находить и использовать "
                          "самые последние знания и сведения "
                          "по заданной тематике",
