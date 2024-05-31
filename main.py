@@ -13,6 +13,16 @@ if 'groq' not in st.session_state:
     if GROQ_API_KEY:
         st.session_state.groq = Groq()
 
+
+# Ансамбль моделей
+models = {
+    "gemma-7b-it": {"name": "Gemma-7b-it", "tokens": 8192, "developer": "Google"},
+    "llama3-70b-8192": {"name": "LLaMA3-70b-8192", "tokens": 8192, "developer": "Meta"},
+    "llama3-8b-8192": {"name": "LLaMA3-8b-8192", "tokens": 8192, "developer": "Meta"},
+    "mixtral-8x7b-32768": {"name": "Mixtral-8x7b-Instruct-v0.1", "tokens": 32768, "developer": "Mistral"},
+}
+
+
 class GenerationStatistics:
     def __init__(self, input_time=0,output_time=0,input_tokens=0,output_tokens=0,total_time=0,model_name="llama3-8b-8192"):
         self.input_time = input_time
@@ -200,11 +210,94 @@ if 'button_disabled' not in st.session_state:
     st.session_state.button_disabled = False
 
 if 'button_text' not in st.session_state:
-    st.session_state.button_text = "Generate"
+    st.session_state.button_text = "Написать"
 
 if 'statistics_text' not in st.session_state:
     st.session_state.statistics_text = ""
 
+# Параметры модели структуры
+st.sidebar.title('Структура')
+model_struct_option = st.sidebar.selectbox(
+    "Модель:",
+    options=list(models.keys()),
+    format_func=lambda x: models[x]["name"],
+    index=1  # Default to llama3-70B
+)
+max_tokens_range_struct = models[model_struct_option]["tokens"]
+max_tokens_struct = st.sidebar.slider(
+    "Максимальное кол-во токенов:",
+    min_value=512,  # Minimum value
+    max_value=max_tokens_range_struct,
+    # Default value or max allowed if less
+    # value=min(32768, max_tokens_range_struct),
+    value=8000,
+    step=256,
+    help=f"Настройте максимальное количество токенов для ответа модели. Для выбранной модели: {max_tokens_range_struct}"
+)
+task_struct = st.sidebar.text_area("Задача в структуру",
+                         "При генерации структуры книги "
+                         "старайся находить и использовать "
+                         "самые последние знания и сведения "
+                         "по заданной тематике",
+                     height = 64)
+
+temp_struct = st.sidebar.number_input(
+    "Установите температуру модели",
+    min_value=0,
+    max_value=200, value=30, step=1,
+) / 100
+top_P_struct = st.sidebar.slider(
+    label = "Тop P :",
+    min_value=0,  # Minimum value
+    max_value=100,
+    # Default value or max allowed if less
+    value=100,
+    step=1,
+    help="Настройте параметр Top_P (по умолчанию=1)"
+) / 100
+
+
+# Параметры модели содержания
+st.sidebar.title('Содержание')
+model_content_option = st.sidebar.selectbox(
+    "Модель",
+    options=list(models.keys()),
+    format_func=lambda x: models[x]["name"],
+    index=2  # Default to llama3-8B
+)
+task_content = st.sidebar.text_area("По содержанию",
+                         " При генерации содержания "
+                         "старайся более подробно описывать "
+                         "применяемые методы диагностики "
+                         "или лечения пациентов, "
+                         "указывай ссылки на источники "
+                         "в которых найдены сведения. ",
+                     height = 128)
+
+max_tokens_range_content = models[model_content_option]["tokens"]
+max_tokens_content = st.sidebar.slider(
+    "Tокены контента",
+    min_value=512,  # Minimum value
+    max_value=max_tokens_range_content,
+    # Default value or max allowed if less
+    value=min(32768, max_tokens_range_content),
+    step=256,
+    help=f"Настройте максимальное количество токенов для ответа модели. Для выбранной модели: {max_tokens_range_content}"
+)
+temp_content = st.sidebar.number_input(
+    "Tемпература контента",
+    min_value=0,
+    max_value=200, value=20, step=1,
+) / 100
+top_P_content = st.sidebar.slider(
+    label = "Тop P в контенте",
+    min_value=0,  # Minimum value
+    max_value=100,
+    # Default value or max allowed if less
+    value=100,
+    step=1,
+    help="Настройте параметр Top_P (по умолчанию=1)"
+) / 100
 
 st.write("""
 ## Пишу книжки на заданную тему :)
@@ -220,23 +313,23 @@ def empty_st():
     st.empty()
 
 try:
-    if st.button('End Generation and Download Book'):
+    if st.button('Закончить генерацию'):
         if "book" in st.session_state:
             markdown_file = create_markdown_file(st.session_state.book.get_markdown_content())
             st.download_button(
-                label='Confirm Download',
+                label='Выгрузить созданное',
                 data=markdown_file,
-                file_name='generated_book.txt',
+                file_name='ai_book.md',
                 mime='text/plain'
             )
         else:
-            raise ValueError("Please generate content first before downloading the book.")
+            raise ValueError("Перед выгрузкой, пожалуйста создайте его :))")
 
     with st.form("groqform"):
         if not GROQ_API_KEY:
-            groq_input_key = st.text_input("Enter your Groq API Key (gsk_yA...):", "",type="password")
+            groq_input_key = st.text_input("Введите ключ генерации ... : ", "",type="password")
 
-        topic_text = st.text_input("What do you want the book to be about?", "")
+        topic_text = st.text_input("О чем вы хотите написать свою книгу?", "")
 
         # Generate button
         submitted = st.form_submit_button(st.session_state.button_text,on_click=disable,disabled=st.session_state.button_disabled)
@@ -287,7 +380,7 @@ try:
                 def stream_section_content(sections):
                     for title, content in sections.items():
                         if isinstance(content, str):
-                            content_stream = generate_section(title+": "+content)
+                            content_stream = generate_section(title+": "+content+task_content)
                             for chunk in content_stream:
                                 # Check if GenerationStatistics data is returned instead of str tokens
                                 chunk_data = chunk
@@ -313,5 +406,5 @@ except Exception as e:
     st.session_state.button_disabled = False
     st.error(e)
 
-    if st.button("Clear"):
+    if st.button("Очистить"):
         st.rerun()
