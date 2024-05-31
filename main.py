@@ -252,10 +252,10 @@ max_tokens_struct = st.sidebar.slider(
 )
 
 task_struct = st.sidebar.text_area("Задача в структуру",
-                         " При генерации структуры и содержания книги "
-                         "старайся находить и использовать "
-                         "самые последние знания и сведения "
-                         "по заданной тематике",
+                        "When generating the structure "
+                        "and content of a book, "
+                        "try to find and use the latest "
+                        "knowledge and information on a given topic. ",
                      height = 64)
 
 temp_struct = st.sidebar.number_input(
@@ -283,12 +283,9 @@ model_content_option = st.sidebar.selectbox(
     index=2  # Default to llama3-8B
 )
 task_content = st.sidebar.text_area("По содержанию",
-                         " При генерации содержания "
-                         "старайся более подробно описывать "
-                         "применяемые методы диагностики "
-                         "или лечения пациентов, "
-                         "указывай ссылки на источники "
-                         "в которых найдены сведения. ",
+"When generating content, describe in detail the methods "
+"used to diagnose and treat patients. Provide links only "
+"to reliable sources of information that contain the necessary information. ",
                      height = 128)
 
 max_tokens_range_content = models[model_content_option]["tokens"]
