@@ -284,7 +284,7 @@ model_content_option = st.sidebar.selectbox(
 )
 task_content = st.sidebar.text_area("По содержанию",
 "When generating content, describe in detail the methods "
-"used to diagnose and treat patients. Provide links only "
+"used to diagnose or treat patients. Provide links only "
 "to reliable sources of information that contain the necessary information. ",
                      height = 128)
 
