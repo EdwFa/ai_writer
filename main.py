@@ -343,8 +343,9 @@ try:
             user_key = st.text_input("Введите, выданный вам ключ ... : 👇", "", type="password")
             if user_key == st.secrets["USER_KEY"]:
                 groq_input_key = st.secrets["API_KEY"]
-            # else:
-            #     raise ValueError("")
+            else:
+                st.info('user key - '+user_key, icon="ℹ️")
+                # raise ValueError("")
 
         topic_text = st.text_input("О чем вы хотите написать свою книгу? ", "")
 
