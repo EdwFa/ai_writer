@@ -382,7 +382,7 @@ try:
             if not GROQ_API_KEY:
                 st.session_state.groq = Groq(api_key=groq_input_key)
 
-            large_model_generation_statistics, book_structure = generate_book_structure(topic_text, model_struct)
+            large_model_generation_statistics, book_structure = generate_book_structure(topic_text)
 
             st.session_state.statistics_text = str(large_model_generation_statistics)
             display_statistics()
