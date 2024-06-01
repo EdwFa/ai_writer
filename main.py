@@ -4,27 +4,6 @@ import json
 import os
 from io import BytesIO
 
-
-st.set_page_config(page_icon="💬", layout="wide",
-                   page_title="AI Писатель")
-
-hide_streamlit_style = """
-<style>
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-</style>
-"""
-
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", None)
-
-if 'api_key' not in st.session_state:
-    st.session_state.api_key = GROQ_API_KEY
-
-if 'groq' not in st.session_state:
-    if GROQ_API_KEY:
-        st.session_state.groq = Groq()
-
-
 # Ансамбль моделей
 models = {
     "gemma-7b-it": {"name": "Gemma-7b-it", "tokens": 8192, "developer": "Google"},
@@ -33,7 +12,37 @@ models = {
     "mixtral-8x7b-32768": {"name": "Mixtral-8x7b-Instruct-v0.1", "tokens": 32768, "developer": "Mistral"},
 }
 
+# Ключи интер=фейсов
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", None)
+if 'api_key' not in st.session_state:
+    st.session_state.api_key = GROQ_API_KEY
+if 'groq' not in st.session_state:
+    if GROQ_API_KEY:
+        st.session_state.groq = Groq()
 
+# Формат страницы
+st.set_page_config(page_icon="💬", layout="wide",
+                   page_title="AI Писатель")
+hide_streamlit_style = """
+<style>
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+</style>
+"""
+
+# Параметры моделей
+class AI_Model():
+    def __init__(self, name='LLaMA3-8b-8192', version='8B', temperature=0.3, max_tokens=8192, top_P=1.0):
+        self.name = name
+        self.version = version
+        self.temperature = temperature
+        self.max_tokens = max_tokens
+        self.top_P = top_P
+# иницифализация моделей для генерации структуры и контента
+model_struct = AI_Model(name='LLaMA3-8b-8192', version='70B', temperature=0.2, max_tokens=8192, top_P=1.0)
+model_content = AI_Model(name='LLaMA3-70b-8192', version='70B', temperature=0.3, max_tokens=8192, top_P=1.0)
+
+# Обрабатываем статистические параметры генерации 8b ламмой
 class GenerationStatistics:
     def __init__(self, input_time=0,output_time=0,input_tokens=0,output_tokens=0,total_time=0,model_name="llama3-8b-8192"):
         self.input_time = input_time
@@ -82,6 +91,7 @@ class GenerationStatistics:
                 f"| Tokens          | {self.input_tokens}            | {self.output_tokens}            | {self.input_tokens + self.output_tokens}            |\n"
                 f"| Inference Time (s) | {self.input_time:.2f}            | {self.output_time:.2f}            | {self.total_time:.2f}            |")
 
+# Книга
 class Book:
     def __init__(self, structure):
         self.structure = structure
@@ -156,14 +166,13 @@ def create_markdown_file(content: str) -> BytesIO:
     markdown_file.seek(0)
     return markdown_file
 
-def generate_book_structure(prompt: str):
+def generate_book_structure(prompt: str, ai_model: AI_Model) -> dict:
     """
     Returns book structure content as well as total tokens and total time for generation.
     """
     prompt = task_struct + prompt
-
     completion = st.session_state.groq.chat.completions.create(
-        model="llama3-70b-8192",
+        model=ai_model.name,
         messages=[
             {
                 "role": "system",
@@ -174,16 +183,16 @@ def generate_book_structure(prompt: str):
                 "content": f"Write a comprehensive structure, omiting introduction and conclusion sections (forward, author's note, summary), for a long (>300 page) book on the following subject:\n\n<subject>{prompt}</subject>"
             }
         ],
-        temperature=0.3,
-        max_tokens=8000,
-        top_p=1,
-        stream=False,
-        response_format={"type": "json_object"},
-        stop=None,
+        temperature = ai_model.temperature,
+        max_tokens = ai_model.max_tokens,
+        top_p = ai_model.top_P,
+        stream = False,
+        response_format = {"type": "json_object"},
+        stop = None,
     )
 
     usage = completion.usage
-    statistics_to_return = GenerationStatistics(input_time=usage.prompt_time, output_time=usage.completion_time, input_tokens=usage.prompt_tokens, output_tokens=usage.completion_tokens, total_time=usage.total_time,model_name="llama3-70b-8192")
+    statistics_to_return = GenerationStatistics(input_time=usage.prompt_time, output_time=usage.completion_time, input_tokens=usage.prompt_tokens, output_tokens=usage.completion_tokens, total_time=usage.total_time,model_name="llama3-8b-8192")
 
     return statistics_to_return, completion.choices[0].message.content
 
@@ -362,8 +371,8 @@ try:
                     placeholder.empty()
 
         if submitted:
-            if len(topic_text)<10:
-                raise ValueError("Book topic must be at least 10 characters long")
+            if len(topic_text)<20:
+                raise ValueError("Тема книги не может быть менее 20 символов ")
 
             st.session_state.button_disabled = True
             # st.write("Generating structure in background....")
@@ -373,7 +382,7 @@ try:
             if not GROQ_API_KEY:
                 st.session_state.groq = Groq(api_key=groq_input_key)
 
-            large_model_generation_statistics, book_structure = generate_book_structure(topic_text)
+            large_model_generation_statistics, book_structure = generate_book_structure(topic_text, model_struct)
 
             # st.session_state.statistics_text = str(large_model_generation_statistics)
             # display_statistics()
