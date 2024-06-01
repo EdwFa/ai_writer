@@ -160,7 +160,7 @@ def generate_book_structure(prompt: str):
     """
     Returns book structure content as well as total tokens and total time for generation.
     """
-    prompt += task_struct
+    prompt = task_struct + prompt
 
     completion = st.session_state.groq.chat.completions.create(
         model="llama3-70b-8192",
@@ -188,6 +188,7 @@ def generate_book_structure(prompt: str):
     return statistics_to_return, completion.choices[0].message.content
 
 def generate_section(prompt: str):
+    prompt = task_content + prompt
     stream = st.session_state.groq.chat.completions.create(
         model="llama3-70b-8192",
         messages=[
@@ -250,7 +251,7 @@ max_tokens_struct = st.sidebar.slider(
 
 task_struct = st.sidebar.text_area("Задача в структуру",
                         "When generating the structure "
-                        "and content of a book, "
+                        "or content , "
                         "try to find and use the latest "
                         "knowledge and information on a given topic. ",
                      height = 64)
@@ -338,7 +339,12 @@ try:
 
     with st.form("groqform"):
         if not GROQ_API_KEY:
-            groq_input_key = st.text_input("Введите, выданный вам ключ ... : 👇", "",type="password")
+            # groq_input_key = st.text_input("Введите, выданный вам ключ ... : 👇", "",type="password")
+            user_key = st.text_input("Введите, выданный вам ключ ... : 👇", "", type="password")
+            if user_key == st.secrets["USER_KEY"]:
+                groq_input_key = st.secrets["API_KEY"]
+            # else:
+            #     raise ValueError("")
 
         topic_text = st.text_input("О чем вы хотите написать свою книгу? ", "")
 
