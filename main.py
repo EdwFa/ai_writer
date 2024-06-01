@@ -166,16 +166,17 @@ def create_markdown_file(content: str) -> BytesIO:
     markdown_file.seek(0)
     return markdown_file
 
-def generate_book_structure(prompt: str,
+def generate_book_structure(prompt: str
                             # ai_model: AI_Model
                             ) -> dict:
     """
     Returns book structure content as well as total tokens and total time for generation.
     """
-    ai_model = AI_Model(name='LLaMA3-8b-8192', version='70B', temperature=0.2, max_tokens=8192, top_P=1.0)
+    ai_model = AI_Model(name="LLaMA3-70b-8192", version="70B", temperature=0.2, max_tokens=8192, top_P=1.0)
     prompt = task_struct + prompt
+    st.info(prompt)
     completion = st.session_state.groq.chat.completions.create(
-        model=ai_model.name,
+        model="LLaMA3-70b-8192",
         messages=[
             {
                 "role": "system",
@@ -186,11 +187,11 @@ def generate_book_structure(prompt: str,
                 "content": f"Write a comprehensive structure, omiting introduction and conclusion sections (forward, author's note, summary), for a long (>300 page) book on the following subject:\n\n<subject>{prompt}</subject>"
             }
         ],
-        temperature = ai_model.temperature,
-        max_tokens = ai_model.max_tokens,
-        top_p = ai_model.top_P,
-        stream = False,
-        response_format = {"type": "json_object"},
+        temperature=ai_model.temperature,
+        max_tokens=ai_model.max_tokens,
+        top_p=ai_model.top_P,
+        stream=False,
+        response_format={"type": "json_object"},
         stop = None,
     )
 
