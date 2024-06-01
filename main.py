@@ -176,7 +176,7 @@ def generate_book_structure(prompt: str
     prompt = task_struct + prompt
     st.info(prompt)
     completion = st.session_state.groq.chat.completions.create(
-        model="LLaMA3-70b-8192",
+        model=ai_model.name,
         messages=[
             {
                 "role": "system",
