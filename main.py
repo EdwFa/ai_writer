@@ -166,10 +166,13 @@ def create_markdown_file(content: str) -> BytesIO:
     markdown_file.seek(0)
     return markdown_file
 
-def generate_book_structure(prompt: str, ai_model: AI_Model) -> dict:
+def generate_book_structure(prompt: str,
+                            # ai_model: AI_Model
+                            ) -> dict:
     """
     Returns book structure content as well as total tokens and total time for generation.
     """
+    ai_model = AI_Model(name='LLaMA3-8b-8192', version='70B', temperature=0.2, max_tokens=8192, top_P=1.0)
     prompt = task_struct + prompt
     completion = st.session_state.groq.chat.completions.create(
         model=ai_model.name,
