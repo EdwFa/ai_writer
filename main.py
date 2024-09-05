@@ -257,7 +257,7 @@ max_tokens_struct = st.sidebar.slider(
     max_value=max_tokens_range_struct,
     # Default value or max allowed if less
     # value=min(32768, max_tokens_range_struct),
-    value=8000,
+    value=8192,
     step=256,
     help=f"Настройте максимальное количество токенов для ответа модели. Для выбранной модели: {max_tokens_range_struct}"
 )
