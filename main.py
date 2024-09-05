@@ -32,15 +32,15 @@ footer {visibility: hidden;}
 
 # Параметры моделей
 class AI_Model():
-    def __init__(self, name="LLaMA3-8b-8192", version="8B", temperature=0.3, max_tokens=8192, top_P=1.0):
+    def __init__(self, name="llama-3.1-8b-instant", version="8B", temperature=0.3, max_tokens=8192, top_P=1.0):
         self.name = name
         self.version = version
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.top_P = top_P
 # иницифализация моделей для генерации структуры и контента
-model_struct = AI_Model(name='LLaMA3-8b-8192', version='8B', temperature=0.2, max_tokens=8192, top_P=1.0)
-model_content = AI_Model(name='LLaMA3-70b-8192', version='70B', temperature=0.2, max_tokens=8192, top_P=1.0)
+model_struct = AI_Model(name='llama-3.1-8b-instant', version='8B', temperature=0.2, max_tokens=8192, top_P=1.0)
+model_content = AI_Model(name='llama-3.1-70b-versatile', version='70B', temperature=0.2, max_tokens=8192, top_P=1.0)
 
 # Обрабатываем статистические параметры генерации 8b ламмой
 class GenerationStatistics:
