@@ -42,9 +42,9 @@ class AI_Model():
 model_struct = AI_Model(name='llama-3.1-8b-instant', version='8B', temperature=0.2, max_tokens=8192, top_P=1.0)
 model_content = AI_Model(name='llama-3.1-70b-versatile', version='70B', temperature=0.2, max_tokens=8192, top_P=1.0)
 
-# Обрабатываем статистические параметры генерации 8b ламмой
+# Обрабатываем статистические параметры генерации 3.1 8b ламмой
 class GenerationStatistics:
-    def __init__(self, input_time=0,output_time=0,input_tokens=0,output_tokens=0,total_time=0,model_name="llama3-8b-8192"):
+    def __init__(self, input_time=0,output_time=0,input_tokens=0,output_tokens=0,total_time=0,model_name="llama-3.1-8b-instant"):
         self.input_time = input_time
         self.output_time = output_time
         self.input_tokens = input_tokens
@@ -172,7 +172,7 @@ def generate_book_structure(prompt: str
     """
     Returns book structure content as well as total tokens and total time for generation.
     """
-    ai_model = AI_Model(name="LLaMA3-70b-8192", version="70B", temperature=0.2, max_tokens=8192, top_P=1.0)
+    ai_model = AI_Model(name="llama-3.1-8b-instant", version="8B", temperature=0.2, max_tokens=8192, top_P=1.0)
     prompt = task_struct + prompt
     st.info(prompt)
     completion = st.session_state.groq.chat.completions.create(
@@ -203,7 +203,7 @@ def generate_book_structure(prompt: str
 def generate_section(prompt: str):
     prompt = task_content + prompt
     stream = st.session_state.groq.chat.completions.create(
-        model="llama3-70b-8192",
+        model="llama-3.1-70b-versatile",
         messages=[
             {
                 "role": "system",
@@ -214,8 +214,8 @@ def generate_section(prompt: str):
                 "content": f"Generate a long, comprehensive, structured chapter for the following section:\n\n<section_title>{prompt}</section_title>"
             }
         ],
-        temperature=0.3,
-        max_tokens=8000,
+        temperature=0.2,
+        max_tokens=8192,
         top_p=1,
         stream=True,
         stop=None,
@@ -391,7 +391,7 @@ try:
             st.session_state.statistics_text = str(large_model_generation_statistics)
             display_statistics()
 
-            total_generation_statistics = GenerationStatistics(model_name="llama3-70b-8192")
+            total_generation_statistics = GenerationStatistics(model_name="llama-3.1-8b-instant")
 
             try:
                 book_structure_json = json.loads(book_structure)
